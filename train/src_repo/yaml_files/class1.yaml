@@ -21,7 +21,7 @@ flip_idx: [0, 2, 1, 4, 3, 6, 5, 8, 7, 10, 9, 12, 11, 14, 13, 16, 15]
 
 # Classes
 names:
-  0: human
+  0: person
 
 # Download script/URL (optional)
 #download: https://ultralytics.com/assets/coco8-pose.zip

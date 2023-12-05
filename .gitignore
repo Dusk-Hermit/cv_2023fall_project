@@ -1,0 +1,4 @@
+__pycache__/
+train/src_repo/datasets/
+train/models/
+**/*.pt
