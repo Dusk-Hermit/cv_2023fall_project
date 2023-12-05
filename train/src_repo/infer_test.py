@@ -1,4 +1,5 @@
 # 测试模型输出结果
+# 会用一些模型，用里面指定的图片路径，生成一个mask文件和json文件，到src_repo/test_output中
 
 from postprocess import *
 from config import *
@@ -24,7 +25,9 @@ jpg_files = glob.glob(f"{val_jpg_folder_path}/*.jpg")
 # 测试模型路径，需要适时修改
 class3_trained_model_path=os.path.join(PROJECT_BASE,"models/yolov8_class3/train/weights/best.pt").replace("\\","/")
 class1_trained_model_path=os.path.join(PROJECT_BASE,"models/yolov8_class1/train/weights/best.pt").replace("\\","/")
-seg_trained_model_path=os.path.join(PROJECT_BASE,"models/yolov8_segmentation/train/weights/best.pt").replace("\\","/")
+# seg_trained_model_path=os.path.join(PROJECT_BASE,"models/yolov8_segmentation/train/weights/best.pt").replace("\\","/")
+seg_trained_model_path=os.path.join("yolov8n-seg.pt").replace("\\","/")
+# 使用原始的yolov8n-seg.pt，梦搞出更多的mask，可以让生成的mask不是全黑的
 
 # 测试一个pipeline
 # 仅仅结合了3分类模型和seg模型，就拼凑出结果
@@ -55,6 +58,6 @@ for img_path in jpg_files:
     mask_path=save_path_name.replace(".jpg",".png")
     json_path=save_path_name.replace(".jpg",".json")
     ## 保存
-    obj = generate_handin_obj_v1(class3_result,seg_result,mask_path)
+    obj = generate_handin_obj_v1(class3_result,seg_result,mask_path,color=(255,255,255))
     with open(json_path, 'w') as f:
         json.dump(obj, f, indent=4)
