@@ -19,6 +19,10 @@ if __name__ == "__main__":
     os.makedirs(seg_tensorboard_dir,exist_ok=True)
     
     for i in range(10):
+        # 重新更新训练集
+        if os.path.exists(os.path.join(PROJECT_BASE,r"src_repo/datasets").replace("\\","/")):
+            shutil.rmtree(os.path.join(PROJECT_BASE,r"src_repo/datasets").replace("\\","/"))
+        os.system('python'+' '+os.path.join(PROJECT_BASE,r"src_repo/preprocess.py").replace("\\","/"))
 
         yolo_python_api.yolo_train(
             pt_dir_path=os.path.join(PROJECT_BASE,r"src_repo\models\yolov8_segmentation").replace("\\","/"),
