@@ -1,4 +1,3 @@
-# 该脚本的执行，会将原始数据集，转换为多个模型需要的训练数据集，并储存在src_repo/datasets文件夹下
 from config import *
 import os
 import sys
@@ -7,6 +6,7 @@ from utils import preprocess_class3
 from utils import preprocess_class1_post
 from utils import preprocess_seg_1_split
 from utils import preprocess_seg_2_mask_to_yolo
+# 该脚本的执行，会将原始数据集，转换为多个模型需要的训练数据集，并储存在src_repo/datasets文件夹下
 
 DATASETS_PATH= os.path.join(PROJECT_BASE, "src_repo/datasets").replace("\\","/")
 

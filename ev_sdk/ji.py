@@ -6,10 +6,14 @@ import cv2
 import os
 from config import *
 from postprocess import *
+import yolo_python_api
 
-class3_trained_model_path=os.path.join(PROJECT_BASE,"models/yolov8_class3/train/weights/best.pt").replace("\\","/")
-class1_trained_model_path=os.path.join(PROJECT_BASE,"models/yolov8_class1/train/weights/best.pt").replace("\\","/")
-seg_trained_model_path=os.path.join(PROJECT_BASE,"models/yolov8_segmentation/train/weights/best.pt").replace("\\","/")
+class3_trained_model_path=yolo_python_api.get_best_pt_path(os.path.join(PROJECT_BASE,"models/yolov8_class3").replace("\\","/"),if_last=False)
+class1_trained_model_path=yolo_python_api.get_best_pt_path(os.path.join(PROJECT_BASE,"models/yolov8_class1").replace("\\","/"),if_last=False)
+seg_trained_model_path=yolo_python_api.get_best_pt_path(os.path.join(PROJECT_BASE,"models/yolov8_segmentation").replace("\\","/"),if_last=False)
+# class3_trained_model_path=os.path.join(PROJECT_BASE,"models/yolov8_class3/train/weights/best.pt").replace("\\","/")
+# class1_trained_model_path=os.path.join(PROJECT_BASE,"models/yolov8_class1/train/weights/best.pt").replace("\\","/")
+# seg_trained_model_path=os.path.join(PROJECT_BASE,"models/yolov8_segmentation/train/weights/best.pt").replace("\\","/")
 
 def init():
     """Initialize model

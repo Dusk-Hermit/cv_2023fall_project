@@ -1,26 +1,32 @@
 ## 项目结构
 
 
-- 使用入口：scripts
-  - 直接执行pipeline.sh可以完成数据预处理+训练+推理
-  - 根据需要，修改sh脚本文件的项目基址
-  - 在训练的sh文件中，需要适时修改本次推理时使用到的模型路径
-- datasets
-  - 数据预处理脚本会再该文件夹下生成一系列可以直接被yolo使用的数据文件格式
-- utils
-  - 数据预处理所使用到的python函数
-- yaml_files
-  - 里面的yaml文件里面硬编码了他们所指向的训练数据集的路径，需要按需修改
-  - scripts中的训练脚本文件中硬编码了使用yaml文件的路径，需要按需修改
-- 执行infer_test.py，会用一些模型，用里面指定的图片路径，生成一个mask文件和json文件，到src_repo/test_output中
-  - 可以用它来做一次完整的推理，输出符合ji.py要求的json文件，并且产生用白色填充seg部分的mask图片
-- ev_sdk
-  - 这个文件夹下需要把train/src_repo文件夹下的`config.py`,`postprocess.py`拷贝进去，尽量集中在train文件夹下测试正确性，最后搬运结果到ev_sdk去
-  - ji.py需要适时修改指定的模型路径
+训练过程已在极市编码平台跑通，无错
 
-未进行：在linux上验证；在测试平台验证是否有错（你们可以来纠一下输出格式错误）
-当前版本只在windows上跑成功了
+编码阶段全流程脚本：`train/src_repo/scripts/pipeline.sh`
+- `preprocess.py`
+  - 输出三个yolo模型需要的训练数据集
+- `train.py`
+  - 三个yolo模型轮流训练
+  - 自动保存最新的训练结果到`/project/train/tensorboard`中
+  - 自动寻找最新版的`last.pt`并在此基础上训练
+- `infer_test.py`
+  - 能测试看看输出最终需要的json格式+mask图片
+  - 自动寻找最新版的`best.pt`并使用它推理
+  - 基于模块`postprocess.py`
 
-里面配备了很多测试脚本，以及测试示例，可以用来试试会不会配置出错，以及看一看效果
+极市平台训练：`bash /project/train/src_repo/scripts/for_training_on_jishi.sh`
 
-*保证执行路径上没有中文*
+推理测试（还未做）
+- `ji.py`
+  - 同样基于模块`postprocess.py`
+  - `project/train`中文件修改后，需要把`ev_sdk`中有的同名脚本文件进行更新
+
+当前方案：三分类模型直接拼一个栏杆mask模型，两个模型独立推理，结果合并成json格式输出
+
+todo
+- 新的架构，如yoloseg和yolo-class1-detect的输出结果，最后加一个二分类classifier，进行判别
+  - 这就需要改很多地方了……
+  - // 尽量新的架构不要变化太多，能使用已经训练的模型最好
+- 其他竞赛可用的技术？冲浪一下打开视野？
+- // 说实话时间不够就是万策尽，怎么救））

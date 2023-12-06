@@ -1,14 +1,9 @@
 #!/bin/bash
 
-PROJECT_BASE="/C/Users/Dusk_Hermit/Desktop/test/tensorflow_test/train"
+PROJECT_BASE="/project/train"
 
-# 全流程
+cd $PROJECT_BASE/src_repo
 
-# 数据集处理
-python "$(dirname "$0")/preprocess.py"
-
-# 训练
-"$(dirname "$0")/train.sh"
-
-# 推理测试
-"$(dirname "$0")/predict_testing.sh"
+python preprocess.py
+python train.py
+python infer_test.py
