@@ -37,6 +37,7 @@ seg_trained_model_path=yolo_python_api.get_best_pt_path(os.path.join(PROJECT_BAS
 # 使用原始的yolov8n-seg.pt，梦搞出更多的mask，可以让生成的mask不是全黑的
 
 if __name__ == "__main__":
+    print('Infer test start')
     print(f'class3_trained_model_path: {class3_trained_model_path}')
     print(f'class1_trained_model_path: {class1_trained_model_path}')
     print(f'seg_trained_model_path: {seg_trained_model_path}')

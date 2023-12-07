@@ -1,7 +1,7 @@
 
 
 
-# path: /project/train/src_repo\datasets_mask  # dataset root dir
+# path: /project/train/src_repo/datasets/segmentation  # dataset root dir
 path: C:\Users\Dusk_Hermit\Desktop\test\tensorflow_test\train\src_repo\datasets\segmentation  # dataset root dir
 train: images/train  # train images (relative to 'path') 4 images
 val: images/val  # val images (relative to 'path') 4 images

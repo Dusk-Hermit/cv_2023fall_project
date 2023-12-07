@@ -1,0 +1,11 @@
+{
+    "algorithm_data": {
+        "is_alert": false,
+        "target_count": 0,
+        "target_info": []
+    },
+    "model_data": {
+        "mask": "C:/Users/Dusk_Hermit/Desktop/test/tensorflow_test/train/src_repo/infer_test_output/2023-12-08-03-07-04-street_111_000292.png",
+        "objects": []
+    }
+}
