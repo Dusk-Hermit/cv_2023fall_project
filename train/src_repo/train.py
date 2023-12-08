@@ -4,6 +4,9 @@ from config import *
 import shutil
 from utils import tensorflow_utils
 import time
+from utils import preprocess_classifier_v2 
+
+
 static_pose_model_path=os.path.join(PROJECT_BASE,r"src_repo\yolov8n-pose.pt").replace("\\","/")
 static_seg_model_path=os.path.join(PROJECT_BASE,r"src_repo\yolov8n-seg.pt").replace("\\","/")
 
@@ -11,6 +14,7 @@ tensorboard_dir=os.path.join(PROJECT_BASE,'tensorboard').replace("\\","/")
 class3_tensorboard_dir=os.path.join(tensorboard_dir,'class3').replace("\\","/")
 class1_tensorboard_dir=os.path.join(tensorboard_dir,'class1').replace("\\","/")
 seg_tensorboard_dir=os.path.join(tensorboard_dir,'segmentation').replace("\\","/")
+classifier_tensorboard_dir=os.path.join(tensorboard_dir,'classifier').replace("\\","/")
 
 model_dir=os.path.join(PROJECT_BASE,'models').replace("\\","/")
 
@@ -29,6 +33,20 @@ if __name__ == "__main__":
     os.makedirs(class3_tensorboard_dir,exist_ok=True)
     os.makedirs(class1_tensorboard_dir,exist_ok=True)
     os.makedirs(seg_tensorboard_dir,exist_ok=True)
+    
+    # remove classifier tensorboard dir
+    if os.path.exists(classifier_tensorboard_dir):
+        shutil.rmtree(classifier_tensorboard_dir)
+    
+    
+    net = preprocess_classifier_v2.CustomNet()
+    tools = preprocess_classifier_v2.generate_train_tools(net)
+    net_config={
+        'nepoch':10,
+        'batch_size':2,
+        'log_freq':4, # 样例集的样本太少了
+        'train_dataset_path':SOURCE_DATA,
+    }
     
     for i in range(LOOPS):
         # 重新更新训练集
@@ -59,13 +77,12 @@ if __name__ == "__main__":
         shutil.copytree(newest_train,target_train)
         tensorflow_utils.write_things_to_tensorboard(target_train)
         print('-'*80)
-        print('Loging model_dir\n')
-        log_content_of_dir_recursively(model_dir)
-        print('-'*80)
-        print('Loging tensorboard_dir\n')
-        log_content_of_dir_recursively(tensorboard_dir)
-        print('-'*80)
-        time.sleep(5)
+        # print('Loging model_dir\n')
+        # log_content_of_dir_recursively(model_dir)
+        # print('-'*80)
+        # print('Loging tensorboard_dir\n')
+        # log_content_of_dir_recursively(tensorboard_dir)
+        # print('-'*80)
         
         print('-'*80)
         print(f'Start {i}th loop. Training class1 model.')
@@ -89,13 +106,12 @@ if __name__ == "__main__":
         shutil.copytree(newest_train,target_train)
         tensorflow_utils.write_things_to_tensorboard(target_train)
         print('-'*80)
-        print('Loging model_dir\n')
-        log_content_of_dir_recursively(model_dir)
-        print('-'*80)
-        print('Loging tensorboard_dir\n')
-        log_content_of_dir_recursively(tensorboard_dir)
-        print('-'*80)
-        time.sleep(5)
+        # print('Loging model_dir\n')
+        # log_content_of_dir_recursively(model_dir)
+        # print('-'*80)
+        # print('Loging tensorboard_dir\n')
+        # log_content_of_dir_recursively(tensorboard_dir)
+        # print('-'*80)
         
         print('-'*80)
         print(f'Start {i}th loop. Training class3 model.')
@@ -118,11 +134,15 @@ if __name__ == "__main__":
         shutil.copytree(newest_train,target_train)
         tensorflow_utils.write_things_to_tensorboard(target_train)
         print('-'*80)
-        print('Loging model_dir\n')
-        log_content_of_dir_recursively(model_dir)
-        print('-'*80)
-        print('Loging tensorboard_dir\n')
-        log_content_of_dir_recursively(tensorboard_dir)
-        print('-'*80)
-        time.sleep(5)
+        # print('Loging model_dir\n')
+        # log_content_of_dir_recursively(model_dir)
+        # print('-'*80)
+        # print('Loging tensorboard_dir\n')
+        # log_content_of_dir_recursively(tensorboard_dir)
+        # print('-'*80)
+        
+        preprocess_classifier_v2.train(net,net_config,tools)
+        if os.path.exists(classifier_tensorboard_dir):
+            shutil.rmtree(classifier_tensorboard_dir)
+        preprocess_classifier_v2.save_model(net)
         

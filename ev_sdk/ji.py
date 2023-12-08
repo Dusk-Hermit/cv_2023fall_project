@@ -7,6 +7,7 @@ import os
 from config import *
 from postprocess import *
 import yolo_python_api
+from utils.preprocess_classifier_v2 import *
 
 class3_trained_model_path=yolo_python_api.get_best_pt_path(os.path.join(PROJECT_BASE,"models/yolov8_class3").replace("\\","/"),if_last=False)
 class1_trained_model_path=yolo_python_api.get_best_pt_path(os.path.join(PROJECT_BASE,"models/yolov8_class1").replace("\\","/"),if_last=False)
@@ -15,15 +16,23 @@ seg_trained_model_path=yolo_python_api.get_best_pt_path(os.path.join(PROJECT_BAS
 # class1_trained_model_path=os.path.join(PROJECT_BASE,"models/yolov8_class1/train/weights/best.pt").replace("\\","/")
 # seg_trained_model_path=os.path.join(PROJECT_BASE,"models/yolov8_segmentation/train/weights/best.pt").replace("\\","/")
 
+# hard link path
+net_model_path=os.path.join(PROJECT_BASE,"models/classifier",'classifier_20231209033526.pth').replace("\\","/")
+
+
 def init():
     """Initialize model
     Returns: model
     """
     class3_model=YOLO(class3_trained_model_path)
     seg_model=YOLO(seg_trained_model_path)
+    classifier = CustomNet()
+    classifier.load_state_dict(torch.load(net_model_path))
+    
     return {
         "class3_model": class3_model,
-        "seg_model": seg_model
+        "seg_model": seg_model,
+        "classifier": classifier,
     }
 
 def process_image(handle=None, input_image=None, args=None, ** kwargs):
@@ -48,6 +57,7 @@ def process_image(handle=None, input_image=None, args=None, ** kwargs):
     # Use model to process the image
     class3_model = handle["class3_model"]
     seg_model = handle["seg_model"]
+    classifier = handle["classifier"]
     
     class3_results = class3_model(temp_image_path)
     seg_results = seg_model(temp_image_path)
@@ -64,6 +74,33 @@ def process_image(handle=None, input_image=None, args=None, ** kwargs):
 
     obj = generate_handin_obj_v1(class3_result,seg_result,mask_output_path,image_shape=(h,w,3))
 
+    object_num = len(obj["model_data"]["objects"])
+    for i in range(object_num):
+        keypoints = obj["model_data"]["objects"][i]["keypoints"]["keypoints"]
+        # print(keypoints)
+        # print('-'*80)
+        keypoints = torch.tensor(keypoints).float()
+        mask_tensor = process_mask(mask_output_path).squeeze()
+        
+        # print(classifier)
+        # print(type(classifier))
+        # print(keypoints)
+        # print(type(keypoints))
+        # print(keypoints.shape)
+        # print(mask_tensor)
+        # print(type(mask_tensor))
+        # print(mask_tensor.shape)
+        keypoints = keypoints.unsqueeze(0)
+        mask_tensor = mask_tensor.unsqueeze(0)
+        output = classifier((keypoints, mask_tensor))
+        # binary classification
+        _, prediction = torch.max(output, 1)
+        if prediction == 0:
+            obj["model_data"]["objects"][i]["name"] = "person"
+            obj['algorithm_data']['target_info'][i]['name'] = 'person'
+        else:
+            obj["model_data"]["objects"][i]["name"] = "climb_over_railing"
+            obj['algorithm_data']['target_info'][i]['name'] = 'climb_over_railing'
 
     ### kept for reference
     fake_result = {}

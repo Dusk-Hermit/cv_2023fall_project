@@ -22,8 +22,8 @@ flip_idx: [0, 2, 1, 4, 3, 6, 5, 8, 7, 10, 9, 12, 11, 14, 13, 16, 15]
 
 # Classes
 names:
-  0: climb_over_railing
-  1: jump_over_railing
+  0: jump_over_railing
+  1: climb_over_railing
   2: person
 
 # Download script/URL (optional)

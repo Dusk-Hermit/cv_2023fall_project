@@ -118,5 +118,26 @@ def yolo_train(
 
 
 if __name__ == "__main__":
-    sample_path=r'C:\Users\Dusk_Hermit\Desktop\test\tensorflow_test\train\models\yolov8_segmentation'.replace("\\","/")
-    print(get_best_pt_path(sample_path))
+    # sample_path=r'C:\Users\Dusk_Hermit\Desktop\test\tensorflow_test\train\models\yolov8_segmentation'.replace("\\","/")
+    # print(get_best_pt_path(sample_path))
+    
+    # yolo_train(
+    #     pt_dir_path=os.path.join(PROJECT_BASE,r"models\yolov8_segmentation").replace("\\","/"),
+    #     alternate_pt=static_seg_model_path,
+    #     epochs=10,
+    #     batch_size=16,
+    #     project_name='yolov8_segmentation',
+    #     yaml=seg_yaml_path,
+    #     imgsz=640,
+    #     patience=20,
+    # )
+    
+    model = YOLO(static_seg_model_path)
+    results = model.train(
+        data=seg_yaml_path,
+        epochs=10,
+        imgsz=640,
+        batch=16,
+        patience=20,
+        project=os.path.join(train_project_base,'yolov8_segmentation').replace("\\","/"),
+    )

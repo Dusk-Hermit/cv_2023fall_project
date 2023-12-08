@@ -1,6 +1,5 @@
 ## 项目结构
 
-
 训练过程已在极市编码平台跑通，无错
 
 编码阶段全流程脚本：`train/src_repo/scripts/pipeline.sh`
@@ -16,27 +15,41 @@
   - 基于模块`postprocess.py`
 
 极市平台训练：`bash /project/train/src_repo/scripts/for_training_on_jishi.sh`
+- 包含前两个py脚本的调用
 
-推理测试（还未做）
+推理测试
 - `ji.py`
   - 同样基于模块`postprocess.py`
-  - `project/train`中文件修改后，需要把`ev_sdk`中有的同名脚本文件进行更新
+  - `project/train`中文件修改后，需要把`ev_sdk`中所有的同名脚本文件进行更新
 
-当前方案：三分类模型直接拼一个栏杆mask模型，两个模型独立推理，结果合并成json格式输出
+旧：*当前方案：三分类模型直接拼一个栏杆mask模型，两个模型独立推理，结果合并成json格式输出*
 
-todo
-- 新的架构，如yoloseg和yolo-class1-detect的输出结果，最后加一个二分类classifier，进行判别
-  - 这就需要改很多地方了……
-  - // 尽量新的架构不要变化太多，能使用已经训练的模型最好
-- 其他竞赛可用的技术？冲浪一下打开视野？
-- // 说实话时间不够就是万策尽，怎么救））
-
+当前方案：利用上面输出的json，在经过一个二分类classifier，根据classifier的输出，修改对应位置json内容
 
 linux上运行的项目，改成windows下运行需要修改哪些地方：
-- scripts脚本，用bat脚本，并且设置project根路径
+- scripts脚本，bat脚本换成sh脚本，并且设置project根路径
 - `config.py`设置project根路径
 - `yaml_files`修改引用路径
+- 部署的时候，跑一遍`pipeline.sh`看看哪里报错
 
-编码阶段和测试阶段需要修改的部分
-- `train.py`的训练loop数
-- 调整训练的模型超参
+
+## 备忘录
+
+编码阶段需要注意的内容
+- 减小`train.py`的epoch数
+- 跑一遍`bash /project/train/src_repo/scripts/pipeline.sh`，和
+- 如果出问题，先在本地项目上debug，然后同步所有修改文件到极市平台
+
+训练之前需要注意的内容
+- 增加epoch数
+- 控制batch_size，使得不会被kill
+- 使用一下`bash /project/train/src_repo/scripts/clear_all_output.sh`
+
+git更新：
+- `git add train ev_sdk README.md`
+- 适时增加`gitignore`内容
+
+## TODO
+///////// 
+测试脚本好像还没把调用三分类模型改成调用一分类模型，之后改
+<!-- `python /project/ev_sdk/test.py`用来在编码环境中模拟调用`ji.py`，使用时需要修改二分类模型的引用路径（没有加上自动寻找），并且要注意将涉及到的两个模型的参数选中参与测试环节。 -->

@@ -15,12 +15,16 @@ def seg_predict_result_to_png(
     image_shape,
     color=(1,1,1),
 ):
-    image_array = np.zeros(image_shape,dtype=np.uint8)
+    image_array = np.zeros((*image_shape,3),dtype=np.uint8)
     if result.masks :
         xy=result.masks.xy
         cv2.fillPoly(image_array, [np.int32(elem) for elem in xy], color=color)
-    image = Image.fromarray(image_array)
+    
+    grey_image=cv2.cvtColor(image_array,cv2.COLOR_BGR2GRAY)
+    
+    image = Image.fromarray(grey_image)
     image.save(save_path)
+    return grey_image
 
 # 这里传入的result也是results的一个元素，但它是检测模型model(img_path)的返回值
 # alert logic v1 version
@@ -56,6 +60,8 @@ def create_ji_result_with_mask_path_v1(
         keypoint_data_copy = keypoint_data.detach().clone()
         keypoint_data_copy[:, :, 2] = torch.round(keypoint_data_copy[:, :, 2] * 2)
         keypoint_data_copy_list=keypoint_data_copy.squeeze().tolist()
+        ####### ADDED LINE
+        keypoint_data_copy_list = [element for sublist in keypoint_data_copy_list for element in sublist]
 
         # Example: Creating object information
         object_info = {

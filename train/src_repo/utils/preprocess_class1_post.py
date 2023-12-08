@@ -5,11 +5,11 @@ import glob
 import os
 
 def copy_and_modify_text_files(source_folder, destination_folder):
-    # 创建目标文件夹
-    os.makedirs(destination_folder, exist_ok=True)
+    if os.path.exists(destination_folder):
+        shutil.rmtree(destination_folder)
 
     # 复制文件夹中的所有内容
-    shutil.copytree(source_folder, destination_folder, dirs_exist_ok=True)
+    shutil.copytree(source_folder, destination_folder,)
 
     # 查找并修改所有 .txt 文件
     txt_files = glob.glob(os.path.join(destination_folder, '**/*.txt'), recursive=True)
