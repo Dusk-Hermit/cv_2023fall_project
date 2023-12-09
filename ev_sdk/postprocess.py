@@ -15,7 +15,8 @@ def seg_predict_result_to_png(
     image_shape,
     color=(1,1,1),
 ):
-    image_array = np.zeros((*image_shape,3),dtype=np.uint8)
+    height,width=image_shape
+    image_array = np.zeros((height,width,3),dtype=np.uint8)
     if result.masks :
         xy=result.masks.xy
         cv2.fillPoly(image_array, [np.int32(elem) for elem in xy], color=color)
@@ -57,6 +58,7 @@ def create_ji_result_with_mask_path_v1(
         cls = cls_list[j] 
         # Example: Extracting keypoint data
         keypoint_data = keypoint.data if keypoint else []
+        print(f'mask_path: {mask_path}, box index: {j}, keypoint_data: {keypoint_data}')
         keypoint_data_copy = keypoint_data.detach().clone()
         keypoint_data_copy[:, :, 2] = torch.round(keypoint_data_copy[:, :, 2] * 2)
         keypoint_data_copy_list=keypoint_data_copy.squeeze().tolist()
@@ -104,6 +106,9 @@ def generate_handin_obj_v1(
     '''
     if image_shape is None:
         image_shape = class3_result.boxes.orig_shape
-    seg_predict_result_to_png(seg_result,save_path,image_shape,color=color)
-    return create_ji_result_with_mask_path_v1(class3_result,save_path)
-    
+    print(f'image_shape: {image_shape}')
+    height=image_shape[0]
+    width=image_shape[1]
+    seg_predict_result_to_png(seg_result,save_path,(height,width),color=color)
+    processed_result = create_ji_result_with_mask_path_v1(class3_result,save_path)
+    return processed_result    

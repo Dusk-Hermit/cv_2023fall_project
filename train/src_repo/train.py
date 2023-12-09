@@ -18,9 +18,15 @@ classifier_tensorboard_dir=os.path.join(tensorboard_dir,'classifier').replace("\
 
 model_dir=os.path.join(PROJECT_BASE,'models').replace("\\","/")
 
+# for testing
 LOOPS=1
 EPOCHS=10
 BATCH_SIZE=32
+
+# # for training
+# LOOPS=20
+# EPOCHS=20
+# BATCH_SIZE=2
 
 def log_content_of_dir_recursively(dirname):
     for x in os.listdir(dirname):
@@ -41,12 +47,21 @@ if __name__ == "__main__":
     
     net = preprocess_classifier_v2.CustomNet()
     tools = preprocess_classifier_v2.generate_train_tools(net)
+    
+    # for testing
     net_config={
-        'nepoch':10,
+        'nepoch':20,
         'batch_size':2,
         'log_freq':4, # 样例集的样本太少了
         'train_dataset_path':SOURCE_DATA,
     }
+    # # for training
+    # net_config={
+    #     'nepoch':20,
+    #     'batch_size':2,
+    #     'log_freq':1000,
+    #     'train_dataset_path':SOURCE_DATA,
+    # }
     
     for i in range(LOOPS):
         # 重新更新训练集

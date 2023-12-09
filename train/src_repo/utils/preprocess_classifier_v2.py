@@ -10,6 +10,7 @@ import glob
 import matplotlib.pyplot as plt
 from torch import nn
 from torch.nn import functional as F
+import shutil
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 import sys
 # Add the parent directory to the sys.path
@@ -25,6 +26,15 @@ from config import *
 FIXED_IMG_SIZE=(224,224)
 # 或者是(1080,1920)？ 但是感觉太大，而且就算变换成正方形也无所谓吧
 # preprocess就需要resize成正方形，否则不支持batch
+
+
+def get_newest_classifier_model_path():
+    classifier_model_dir_path=os.path.join(PROJECT_BASE,'models','classifier').replace("\\","/")
+    list=os.listdir(classifier_model_dir_path)
+    # sort and get the newest model
+    list.sort(key=lambda fn: os.path.getmtime(os.path.join(classifier_model_dir_path, fn)))
+    return os.path.join(classifier_model_dir_path,list[-1]).replace("\\","/")
+    
 
 def return_ready_datapiece(img_path):
     # 输入的img_path，是一个jpg文件的绝对路径，同名的json和png文件也应当存在
@@ -50,8 +60,17 @@ def return_ready_datapiece(img_path):
         data.append((category_id,keypoints,mask_path))
     return data
 
-def process_mask(mask_path):
+def process_mask(mask_path,keypoints):
     mask = Image.open(mask_path)
+    width, height = mask.size
+    assert len(keypoints) == 17*3
+    for i in range(17*3):
+        if i % 3 == 0:
+            keypoints[i] = keypoints[i] / width
+        elif i % 3 == 1:
+            keypoints[i] = keypoints[i] / height
+        else:
+            keypoints[i] = keypoints[i] /2 # visibility = 0, 1, 2
     
     # 先禁用transform，transform在这里能干嘛？
     # mask_tensor = transforms.ToTensor()(mask)
@@ -70,7 +89,7 @@ def process_mask(mask_path):
     # print(f'max_value: {max_value}')
 
     # resized_mask_tensor = (mask_tensor - min_value) / (max_value - min_value)
-    return resized_mask_tensor
+    return resized_mask_tensor,keypoints
 
 class CustomDataset(Dataset):
     def __init__(self, raw_folder, transform=None):
@@ -91,7 +110,7 @@ class CustomDataset(Dataset):
     def __getitem__(self, idx):
         
         category_id,keypoints,mask_path=self.data[idx]
-        resized_mask_tensor = process_mask(mask_path)
+        resized_mask_tensor,keypoints = process_mask(mask_path,keypoints)
 
         return category_id, keypoints, resized_mask_tensor
 
@@ -176,6 +195,8 @@ def save_model(net):
     
     tensorboard_dir=os.path.join(PROJECT_BASE,'tensorboard').replace("\\","/")
     log_dir=os.path.join(tensorboard_dir,'classifier').replace("\\","/")
+    if os.path.exists(log_dir):
+        shutil.rmtree(log_dir)
     file_writer = tf.summary.create_file_writer(log_dir)
     encode_img_with_filepath_write_to_tensorboard(save_model_path,file_writer,)
     
