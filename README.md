@@ -50,6 +50,11 @@ git更新：
 - `git add train ev_sdk README.md`
 - 适时增加`gitignore`内容
 
+提交训练脚本：`bash /project/train/src_repo/scripts/for_training_on_jishi.sh`
+测试无需脚本
+
+
 ## TODO
 ///////// 
+用于测试的文件结构需要修改一下——有bug，总是改不对，感觉是自己测试平台账号的问题……
 ？ONNX+TensorRT？
