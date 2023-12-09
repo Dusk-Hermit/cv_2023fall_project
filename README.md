@@ -43,6 +43,7 @@ linux上运行的项目，改成windows下运行需要修改哪些地方：
 训练之前需要注意的内容
 - 增加epoch数
 - 控制batch_size，使得不会被kill
+- 修改net_config，二分类的训练设置参数
 - 使用一下`bash /project/train/src_repo/scripts/clear_all_output.sh`
 
 git更新：
